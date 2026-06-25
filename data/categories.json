@@ -1,0 +1,127 @@
+{
+  "categories": [
+    {
+      "id": "office",
+      "name": "办公工具",
+      "icon": "📊",
+      "description": "提升工作效率的办公软件和工具",
+      "color": "#3498DB",
+      "subcategories": [
+        {
+          "id": "office-suite",
+          "name": "办公套件",
+          "description": "Word、Excel、PowerPoint等文档处理工具"
+        },
+        {
+          "id": "project-management",
+          "name": "项目管理",
+          "description": "任务管理、进度跟踪、团队协作工具"
+        },
+        {
+          "id": "design-tools",
+          "name": "设计工具",
+          "description": "平面设计、UI/UX设计、视频编辑软件"
+        },
+        {
+          "id": "system-optimization",
+          "name": "系统优化",
+          "description": "系统清理、性能优化、安全防护工具"
+        }
+      ]
+    },
+    {
+      "id": "ai",
+      "name": "AI工具",
+      "icon": "🤖",
+      "description": "人工智能相关应用和工具",
+      "color": "#9B59B6",
+      "subcategories": [
+        {
+          "id": "chat-ai",
+          "name": "聊天AI",
+          "description": "ChatGPT、Claude等对话式AI助手"
+        },
+        {
+          "id": "ai-writing",
+          "name": "AI写作",
+          "description": "智能文案生成、内容创作工具"
+        },
+        {
+          "id": "ai-art",
+          "name": "AI艺术",
+          "description": "AI绘画、图像生成、创意设计工具"
+        },
+        {
+          "id": "ai-coding",
+          "name": "AI编程",
+          "description": "代码生成、智能编程助手、开发工具"
+        }
+      ]
+    },
+    {
+      "id": "documents",
+      "name": "文档资料",
+      "icon": "📄",
+      "description": "技术文档、电子书、使用手册",
+      "color": "#27AE60",
+      "subcategories": [
+        {
+          "id": "tech-docs",
+          "name": "技术文档",
+          "description": "API文档、开发指南、技术手册"
+        },
+        {
+          "id": "ebooks",
+          "name": "电子书",
+          "description": "编程、设计、管理等领域的电子书籍"
+        },
+        {
+          "id": "tutorials",
+          "name": "教程指南",
+          "description": "软件使用教程、操作指南、入门手册"
+        },
+        {
+          "id": "templates",
+          "name": "模板素材",
+          "description": "简历模板、报告模板、设计素材"
+        }
+      ]
+    },
+    {
+      "id": "videos",
+      "name": "视频教程",
+      "icon": "🎥",
+      "description": "在线课程、技术分享、视频教程",
+      "color": "#E74C3C",
+      "subcategories": [
+        {
+          "id": "programming",
+          "name": "编程教学",
+          "description": "编程语言、算法、数据结构等课程"
+        },
+        {
+          "id": "design",
+          "name": "设计教程",
+          "description": "UI/UX设计、平面设计、3D建模课程"
+        },
+        {
+          "id": "ai-courses",
+          "name": "AI课程",
+          "description": "人工智能、机器学习、深度学习课程"
+        },
+        {
+          "id": "productivity",
+          "name": "效率提升",
+          "description": "时间管理、效率工具、办公技巧视频"
+        }
+      ]
+    }
+  ],
+  "stats": {
+    "totalResources": 16,
+    "totalDownloads": 28236,
+    "totalCategories": 4,
+    "totalSubcategories": 16,
+    "lastUpdated": "2024-01-25"
+  }
+}

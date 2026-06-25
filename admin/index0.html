@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>后台管理系统 - 学习资源中心</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 隐藏 Turnstile 验证容器 */
+        .cf-turnstile {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录界面 -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-box">
+            <h2><i class="fas fa-lock"></i> 后台管理系统</h2>
+            <p>请输入访问密码</p>
+            <input type="password" id="passwordInput" placeholder="请输入密码" onkeypress="handleLogin(event)">
+            
+            <!-- Turnstile 无感验证容器 - 完全隐藏 -->
+            <div class="cf-turnstile"
+                 data-sitekey="0x4AAAAAADAQf8SStWLX5dkj"
+                 data-size="invisible">
+            </div>
+            
+            <button onclick="login()">
+                <i class="fas fa-sign-in-alt"></i> 登录
+            </button>
+            <p class="error-message" id="loginError"></p>
+        </div>
+    </div>
+
+    <!-- 主管理界面 -->
+    <div id="adminPanel" style="display: none;">
+        <!-- 顶部导航 -->
+        <nav class="admin-nav">
+            <div class="nav-brand">
+                <i class="fas fa-cog"></i> 后台管理系统
+            </div>
+            <div class="nav-menu">
+                <button class="nav-btn active" onclick="showSection('dashboard')">
+                    <i class="fas fa-tachometer-alt"></i> 仪表板
+                </button>
+                <button class="nav-btn" onclick="showSection('resources')">
+                    <i class="fas fa-folder-open"></i> 资源管理
+                </button>
+                <button class="nav-btn" onclick="showSection('categories')">
+                    <i class="fas fa-tags"></i> 分类管理
+                </button>
+                <button class="nav-btn" onclick="showSection('upload')">
+                    <i class="fas fa-upload"></i> 文件上传
+                </button>
+                <button class="nav-btn" onclick="showSection('settings')">
+                    <i class="fas fa-cog"></i> 系统设置
+                </button>
+            </div>
+            <div class="nav-user">
+                <button onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> 退出
+                </button>
+            </div>
+        </nav>
+
+        <!-- 主内容区 -->
+        <main class="admin-main">
+            <!-- 仪表板 -->
+            <section id="dashboard" class="admin-section active">
+                <h1><i class="fas fa-tachometer-alt"></i> 仪表板</h1>
+
+                <!-- 统计卡片 -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-file-alt"></i>
+                        <h3>总资源数</h3>
+                        <p class="stat-number" id="totalResources">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-download"></i>
+                        <h3>总下载量</h3>
+                        <p class="stat-number" id="totalDownloads">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-folder"></i>
+                        <h3>分类数量</h3>
+                        <p class="stat-number" id="totalCategories">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-clock"></i>
+                        <h3>最后更新</h3>
+                        <p class="stat-time" id="lastUpdate">-</p>
+                    </div>
+                </div>
+
+                <!-- 最近更新 -->
+                <div class="recent-updates">
+                    <h2>最近更新的资源</h2>
+                    <div class="updates-list" id="recentUpdates">
+                        <!-- 动态加载 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 资源管理 -->
+            <section id="resources" class="admin-section">
+                <div class="section-header">
+                    <h1><i class="fas fa-folder-open"></i> 资源管理</h1>
+                    <button class="btn-primary" onclick="showAddResourceModal()">
+                        <i class="fas fa-plus"></i> 添加资源
+                    </button>
+                </div>
+
+                <!-- 搜索和筛选 -->
+                <div class="filters">
+                    <input type="text" id="resourceSearch" placeholder="搜索资源..." onkeyup="filterResources()">
+                    <select id="categoryFilter" onchange="filterResources()">
+                        <option value="">所有分类</option>
+                        <option value="office">办公工具</option>
+                        <option value="ai">AI工具</option>
+                        <option value="documents">文档资料</option>
+                        <option value="videos">视频教程</option>
+                    </select>
+                    <select id="typeFilter" onchange="filterResources()">
+                        <option value="">所有类型</option>
+                        <option value="software">软件</option>
+                        <option value="pdf">PDF</option>
+                        <option value="ebook">电子书</option>
+                        <option value="video">视频</option>
+                    </select>
+                </div>
+
+                <!-- 资源列表 -->
+                <div class="resource-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>标题</th>
+                                <th>分类</th>
+                                <th>类型</th>
+                                <th>下载次数</th>
+                                <th>评分</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resourceTableBody">
+                            <!-- 动态加载 -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 分类管理 -->
+            <section id="categories" class="admin-section">
+                <h1><i class="fas fa-tags"></i> 分类管理</h1>
+
+                <div class="categories-grid" id="categoriesGrid">
+                    <!-- 动态加载 -->
+                </div>
+            </section>
+
+            <!-- 文件上传 -->
+            <section id="upload" class="admin-section">
+                <h1><i class="fas fa-upload"></i> 文件上传</h1>
+
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>拖拽文件到此处或点击上传</p>
+                    <input type="file" id="fileInput" multiple style="display: none;">
+                    <button class="btn-primary" onclick="document.getElementById('fileInput').click()">
+                        选择文件
+                    </button>
+                </div>
+
+                <div class="upload-queue" id="uploadQueue">
+                    <!-- 上传队列 -->
+                </div>
+
+                <div class="uploaded-files">
+                    <h3>已上传文件</h3>
+
+                    <!-- 文件分类显示 -->
+                    <div class="file-categories">
+                        <div class="file-category">
+                            <h4><i class="fas fa-file-archive"></i> 压缩文件 (.zip, .rar)</h4>
+                            <div class="files-grid" id="archive-files">
+                                <!-- 压缩文件列表 -->
+                            </div>
+                        </div>
+
+                        <div class="file-category">
+                            <h4><i class="fas fa-file-code"></i> 软件安装包 (.exe, .dmg, .pkg)</h4>
+                            <div class="files-grid" id="software-files">
+                                <!-- 软件文件列表 -->
+                            </div>
+                        </div>
+
+                        <div class="file-category">
+                            <h4><i class="fas fa-file-pdf"></i> 文档资料 (.pdf, .doc, .docx)</h4>
+                            <div class="files-grid" id="document-files">
+                                <!-- 文档文件列表 -->
+                            </div>
+                        </div>
+
+                        <div class="file-category">
+                            <h4><i class="fas fa-file-video"></i> 视频文件 (.mp4, .avi, .mkv)</h4>
+                            <div class="files-grid" id="video-files">
+                                <!-- 视频文件列表 -->
+                            </div>
+                        </div>
+
+                        <div class="file-category">
+                            <h4><i class="fas fa-file-image"></i> 图片文件 (.png, .jpg, .gif)</h4>
+                            <div class="files-grid" id="image-files">
+                                <!-- 图片文件列表 -->
+                            </div>
+                        </div>
+
+                        <div class="file-category">
+                            <h4><i class="fas fa-file-code"></i> 其他文件</h4>
+                            <div class="files-grid" id="other-files">
+                                <!-- 其他文件列表 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 系统设置 -->
+            <section id="settings" class="admin-section">
+                <h1><i class="fas fa-cog"></i> 系统设置</h1>
+
+                <div class="settings-form">
+                    <h2>网站配置</h2>
+                    <div class="form-group">
+                        <label>网站标题</label>
+                        <input type="text" id="siteTitle" value="学习资源中心">
+                    </div>
+                    <div class="form-group">
+                        <label>网站描述</label>
+                        <textarea id="siteDescription">收集和分享优质的学习资源，帮助大家提升工作效率和学习成果。</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>联系邮箱</label>
+                        <input type="email" id="contactEmail" value="contact@example.com">
+                    </div>
+
+                    <h2>安全设置</h2>
+                    <div class="form-group">
+                        <label>管理密码</label>
+                        <input type="password" id="adminPassword" placeholder="输入新密码">
+                    </div>
+                    <div class="form-group">
+                        <label>确认密码</label>
+                        <input type="password" id="confirmPassword" placeholder="再次输入密码">
+                    </div>
+
+                    <button class="btn-primary" onclick="saveSettings()">
+                        <i class="fas fa-save"></i> 保存设置
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 添加/编辑资源模态框 -->
+    <div id="resourceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">添加资源</h2>
+                <span class="close" onclick="closeResourceModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="resourceForm">
+                    <div class="form-group">
+                        <label>资源ID *</label>
+                        <input type="text" id="resourceId" required>
+                    </div>
+                    <div class="form-group">
+                        <label>标题 *</label>
+                        <input type="text" id="resourceTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label>分类 *</label>
+                        <select id="resourceCategory" required>
+                            <option value="">请选择</option>
+                            <option value="office">办公工具</option>
+                            <option value="ai">AI工具</option>
+                            <option value="documents">文档资料</option>
+                            <option value="videos">视频教程</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>类型 *</label>
+                        <select id="resourceType" required>
+                            <option value="">请选择</option>
+                            <option value="software">软件</option>
+                            <option value="pdf">PDF</option>
+                            <option value="ebook">电子书</option>
+                            <option value="video">视频</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>描述 *</label>
+                        <textarea id="resourceDescription" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>文件大小</label>
+                        <input type="text" id="resourceSize" placeholder="如：2.5GB">
+                    </div>
+                    <div class="form-group">
+                        <label>版本号（可选）</label>
+                        <input type="text" id="resourceVersion" placeholder="如：2024">
+                    </div>
+                    <div class="form-group">
+                        <label>下载链接 *</label>
+                        <div class="url-input-group">
+                            <input type="text" id="resourceUrl" required>
+                            <button type="button" class="btn-secondary" onclick="showFileSelector()">
+                                <i class="fas fa-folder-open"></i> 选择文件
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>缩略图链接</label>
+                        <div class="url-input-group">
+                            <input type="text" id="resourceThumbnail">
+                            <button type="button" class="btn-secondary" onclick="showImageSelector()">
+                                <i class="fas fa-image"></i> 选择图片
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>标签</label>
+                        <div class="tags-selector">
+                            <div class="tags-grid">
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="办公" onchange="updateSelectedTags()">
+                                    <span>办公</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="AI" onchange="updateSelectedTags()">
+                                    <span>AI</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="文档" onchange="updateSelectedTags()">
+                                    <span>文档</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="视频" onchange="updateSelectedTags()">
+                                    <span>视频</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="工具" onchange="updateSelectedTags()">
+                                    <span>工具</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="教程" onchange="updateSelectedTags()">
+                                    <span>教程</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="软件" onchange="updateSelectedTags()">
+                                    <span>软件</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="PDF" onchange="updateSelectedTags()">
+                                    <span>PDF</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="国产" onchange="updateSelectedTags()">
+                                    <span>国产</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="免费" onchange="updateSelectedTags()">
+                                    <span>免费</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="开源" onchange="updateSelectedTags()">
+                                    <span>开源</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="在线" onchange="updateSelectedTags()">
+                                    <span>在线</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="聊天" onchange="updateSelectedTags()">
+                                    <span>聊天</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="编程" onchange="updateSelectedTags()">
+                                    <span>编程</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="写作" onchange="updateSelectedTags()">
+                                    <span>写作</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="艺术" onchange="updateSelectedTags()">
+                                    <span>艺术</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="模板" onchange="updateSelectedTags()">
+                                    <span>模板</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="电子书" onchange="updateSelectedTags()">
+                                    <span>电子书</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="课程" onchange="updateSelectedTags()">
+                                    <span>课程</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="设计" onchange="updateSelectedTags()">
+                                    <span>设计</span>
+                                </label>
+                                <label class="tag-checkbox">
+                                    <input type="checkbox" value="效率" onchange="updateSelectedTags()">
+                                    <span>效率</span>
+                                </label>
+                            </div>
+                            <input type="hidden" id="resourceTags">
+                            <small class="selected-tags-display">已选择: <span id="tagsPreview">无</span></small>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>评分（1-5）</label>
+                        <input type="number" id="resourceRating" min="1" max="5" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>下载次数</label>
+                        <input type="number" id="resourceDownloads" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>上传日期</label>
+                        <input type="date" id="resourceDate">
+                    </div>
+                    <div class="form-group">
+                        <label>作者</label>
+                        <input type="text" id="resourceAuthor">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save"></i> 保存
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="closeResourceModal()">
+                            取消
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示消息 -->
+    <div id="notification" class="notification"></div>
+
+    <!-- 引入 Turnstile 官方JS -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
+    
+    <script src="../js/data-init.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="admin.js"></script>
+    <script src="admin-functions.js"></script>
+    <script src="admin-upload.js"></script>
+    async function login() {
+  const passwordInput = document.getElementById('passwordInput');
+  const loginError = document.getElementById('loginError');
+  const password = passwordInput.value.trim();
+
+  loginError.textContent = '';
+
+  if (!password) {
+    loginError.textContent = '请输入密码';
+    return;
+  }
+
+  // ======================
+  // 在这里写你的正确密码
+  // ======================
+  const RIGHT_PWD = "123456";
+
+  if (password !== RIGHT_PWD) {
+    loginError.textContent = "密码错误";
+    return;
+  }
+
+  try {
+    // 自动走验证
+    const token = await turnstile.execute('.cf-turnstile');
+    const formData = new FormData();
+    formData.append('cf-turnstile-response', token);
+
+    const res = await fetch("https://curly-wildflower-5c2a.bin220797.workers.dev/verify", {
+      method: "POST",
+      body: formData
+    });
+
+    const result = await res.json();
+  } catch (e) {}
+
+  // 不管验证成功失败，只要密码对，直接登录
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminPanel').style.display = 'block';
+  loadDashboardData();
+}
+
+function handleLogin(e) {
+  if (e.key === 'Enter') login();
+}
+    
+    </script>
+</body>
+</html>

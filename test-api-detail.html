@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API测试详情</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .step { margin: 20px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>API测试详情</h1>
+    
+    <div class="step">
+        <h2>步骤1: 清除localStorage</h2>
+        <button onclick="clearLocalStorage()">清除localStorage</button>
+        <div id="localStorageStatus"></div>
+    </div>
+    
+    <div class="step">
+        <h2>步骤2: 测试API请求</h2>
+        <button onclick="testAPI()">测试API</button>
+        <div id="apiStatus"></div>
+        <div id="apiResponse"></div>
+    </div>
+    
+    <div class="step">
+        <h2>步骤3: 测试前端渲染</h2>
+        <button onclick="testRender()">测试渲染</button>
+        <div id="renderResult"></div>
+    </div>
+    
+    <script>
+        function clearLocalStorage() {
+            localStorage.removeItem('resources');
+            document.getElementById('localStorageStatus').innerHTML = 'localStorage已清除';
+        }
+        
+        async function testAPI() {
+            try {
+                const response = await fetch('/api/resources');
+                document.getElementById('apiStatus').innerHTML = `响应状态: ${response.status}`;
+                
+                const data = await response.json();
+                document.getElementById('apiResponse').innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                
+                // 保存到localStorage
+                localStorage.setItem('resources', JSON.stringify(data));
+                document.getElementById('apiStatus').innerHTML += '<br>数据已保存到localStorage';
+            } catch (error) {
+                document.getElementById('apiStatus').innerHTML = `错误: ${error.message}`;
+                document.getElementById('apiResponse').innerHTML = `<pre>${error.stack}</pre>`;
+            }
+        }
+        
+        function testRender() {
+            try {
+                const stored = localStorage.getItem('resources');
+                if (!stored) {
+                    document.getElementById('renderResult').innerHTML = 'localStorage中无数据';
+                    return;
+                }
+                
+                const resources = JSON.parse(stored);
+                document.getElementById('renderResult').innerHTML = `<h3>渲染结果:</h3><pre>${JSON.stringify(resources, null, 2)}</pre>`;
+                
+                // 模拟排序和渲染
+                if (resources.length > 0) {
+                    resources.sort(function(a, b) {
+                        return new Date(b.uploadDate) - new Date(a.uploadDate);
+                    });
+                    const sorted = resources.slice(0, 6);
+                    
+                    let html = '<h4>排序后的前6个资源:</h4>';
+                    sorted.forEach(resource => {
+                        html += `<div style="margin: 10px 0; padding: 10px; border: 1px solid #ccc;">
+                            <h5>${resource.title}</h5>
+                            <p>${resource.description}</p>
+                            <p>分类: ${resource.category}</p>
+                            <p>上传日期: ${resource.uploadDate}</p>
+                        </div>`;
+                    });
+                    document.getElementById('renderResult').innerHTML += html;
+                }
+            } catch (error) {
+                document.getElementById('renderResult').innerHTML = `错误: ${error.message}`;
+            }
+        }
+        
+        // 页面加载时自动测试
+        window.onload = function() {
+            clearLocalStorage();
+            testAPI();
+        };
+    </script>
+</body>
+</html>

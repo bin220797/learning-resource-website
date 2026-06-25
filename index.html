@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习资源中心 - 办公工具、AI工具、教程视频</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="icon" href="images/favicon.ico">
+</head>
+<body>
+    <!-- 头部导航 -->
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <img src="images/logo.svg" alt="学习资源中心" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiIGZpbGw9IiMzNDk4REIiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0iI2ZmZmZmZiIvPgo8L3N2Zz4='">
+                    <span>学习资源中心</span>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="active">首页</a></li>
+                    <li><a href="office-tools.html">办公工具</a></li>
+                    <li><a href="ai-tools.html">AI工具</a></li>
+                    <li><a href="documents.html">文档资料</a></li>
+                    <li><a href="videos.html">视频教程</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- 主横幅 -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>发现优质学习资源，提升工作效率</h1>
+            <p>收录精选办公工具、AI工具、技术文档和视频教程</p>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索资源...">
+                <button onclick="performSearch()"><i>🔍</i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 分类入口 -->
+    <section class="categories">
+        <h2 class="animate-on-scroll">资源分类</h2>
+        <div class="category-grid">
+            <div class="category-card animate-on-scroll" onclick="window.location.href='office-tools.html'">
+                <div class="category-icon">📊</div>
+                <h3>办公工具</h3>
+                <p>Office套件、项目管理、协作工具</p>
+                <span class="resource-count">15个资源</span>
+            </div>
+            <div class="category-card animate-on-scroll" onclick="window.location.href='ai-tools.html'">
+                <div class="category-icon">🤖</div>
+                <h3>AI工具</h3>
+                <p>人工智能助手、AI写作、AI设计</p>
+                <span class="resource-count">20个资源</span>
+            </div>
+            <div class="category-card animate-on-scroll" onclick="window.location.href='documents.html'">
+                <div class="category-icon">📄</div>
+                <h3>文档资料</h3>
+                <p>技术文档、使用手册、电子书</p>
+                <span class="resource-count">30个资源</span>
+            </div>
+            <div class="category-card animate-on-scroll" onclick="window.location.href='videos.html'">
+                <div class="category-icon">🎥</div>
+                <h3>视频教程</h3>
+                <p>在线课程、视频教程、技术分享</p>
+                <span class="resource-count">25个资源</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 最新资源 -->
+    <section class="latest-resources">
+        <h2 class="animate-on-scroll">最新资源</h2>
+        <div class="resource-grid" id="latestResources">
+            <!-- 资源卡片将通过JavaScript动态加载 -->
+        </div>
+    </section>
+
+    <!-- 特色推荐 -->
+    <section class="featured">
+        <h2 class="animate-on-scroll">特色推荐</h2>
+        <div class="featured-content" id="featuredResources">
+            <!-- 特色资源将通过JavaScript动态加载 -->
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>关于网站</h3>
+                <p>收集和分享优质的学习资源，帮助大家提升工作效率和学习成果。</p>
+            </div>
+            <div class="footer-section">
+                <h3>快速链接</h3>
+                <ul>
+                    <li><a href="office-tools.html">办公工具</a></li>
+                    <li><a href="ai-tools.html">AI工具</a></li>
+                    <li><a href="documents.html">文档资料</a></li>
+                    <li><a href="videos.html">视频教程</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>联系我们</h3>
+                <p>如有问题或建议，欢迎邮件联系。</p>
+                <p>📧 contact@example.com</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 学习资源中心. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- 返回顶部按钮 -->
+    <button id="backToTop" onclick="scrollToTop()">
+        <i>↑</i>
+    </button>
+
+    <script src="js/data-init.js"></script>
+    <script src="js/category-loader.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

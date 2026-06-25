@@ -1,0 +1,25 @@
+# 大文件不上传 GitHub（已存七牛云）
+uploads/*
+!uploads/.gitkeep
+
+# 依赖
+node_modules/
+
+# 环境变量（包含密钥）
+.env
+
+# 日志
+logs/
+*.log
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# 临时文件
+tmp/
+temp/

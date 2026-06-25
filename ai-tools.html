@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI工具 - 学习资源中心</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <style>
+        .category-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .category-header h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .category-header p {
+            font-size: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .filter-section {
+            background-color: white;
+            padding: 30px 20px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            border: 2px solid #3498DB;
+            background: white;
+            color: #3498DB;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background-color: #3498DB;
+            color: white;
+        }
+
+        .resource-section {
+            padding: 40px 20px;
+        }
+
+        .ai-tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            grid-auto-rows: 1fr;
+        }
+
+        .document-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .document-btn {
+            flex: 1;
+            min-height: 48px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .preview-btn {
+            background-color: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .preview-btn:hover {
+            background-color: var(--border-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .download-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .download-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .download-btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部导航 -->
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <img src="images/logo.svg" alt="学习资源中心" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiIGZpbGw9IiMzNDk4REIiIHN0cm9rZT0iI2ZmZmZmZiIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0iI2ZmZmZmZiIvPgo8L3N2Zz4='">
+                    <span>学习资源中心</span>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="office-tools.html">办公工具</a></li>
+                    <li><a href="ai-tools.html" class="active">AI工具</a></li>
+                    <li><a href="documents.html">文档资料</a></li>
+                    <li><a href="videos.html">视频教程</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- 分类头部 -->
+    <section class="category-header">
+        <h1>🤖 AI工具</h1>
+        <p>探索最新的人工智能工具，从聊天助手到创意设计，让AI为你助力工作与学习</p>
+    </section>
+
+    <!-- 筛选选项 -->
+    <section class="filter-section">
+        <h2>筛选工具类型</h2>
+        <div class="filter-options">
+            <button class="filter-btn active" onclick="showByTag('')">全部</button>
+            <button class="filter-btn" onclick="showByTag('AI')">AI</button>
+            <button class="filter-btn" onclick="showByTag('工具')">工具</button>
+            <button class="filter-btn" onclick="showByTag('聊天')">聊天</button>
+            <button class="filter-btn" onclick="showByTag('编程')">编程</button>
+            <button class="filter-btn" onclick="showByTag('写作')">写作</button>
+            <button class="filter-btn" onclick="showByTag('艺术')">艺术</button>
+        </div>
+    </section>
+
+    <!-- AI工具列表 -->
+    <section class="resource-section">
+        <div class="ai-tools-grid" id="aiToolsGrid">
+            <!-- 工具卡片将通过JavaScript动态加载 -->
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>关于网站</h3>
+                <p>收集和分享优质的学习资源，帮助大家提升工作效率和学习成果。</p>
+            </div>
+            <div class="footer-section">
+                <h3>快速链接</h3>
+                <ul>
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="office-tools.html">办公工具</a></li>
+                    <li><a href="documents.html">文档资料</a></li>
+                    <li><a href="videos.html">视频教程</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>联系我们</h3>
+                <p>如有问题或建议，欢迎邮件联系。</p>
+                <p>📧 contact@example.com</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 学习资源中心. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- 返回顶部按钮 -->
+    <button id="backToTop" onclick="scrollToTop()">
+        <i>↑</i>
+    </button>
+
+    <script src="js/data-init.js"></script>
+    <script src="js/category-loader.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAITools();
+            initializeScrollToTop();
+        });
+
+        // 加载AI工具
+        function loadAITools() {
+            try {
+                // 从服务器API获取最新数据，添加缓存控制参数
+                fetch('/api/resources?_=' + Date.now())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('获取资源数据失败: ' + response.status);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('从API获取到的资源数据:', data);
+                        const aiTools = data.filter(resource => resource.category === 'ai');
+                        renderAITools(aiTools);
+                    })
+                    .catch(error => {
+                        console.error('Error loading AI tools:', error);
+                        // 如果API失败，尝试使用本地文件作为后备
+                        fetch('../data/resources.json')
+                            .then(response => response.json())
+                            .then(data => {
+                                const aiTools = data.filter(resource => resource.category === 'ai');
+                                renderAITools(aiTools);
+                            })
+                            .catch(fallbackError => {
+                                console.error('Error loading fallback data:', fallbackError);
+                                document.getElementById('aiToolsGrid').innerHTML = '<div class="no-results">加载失败，请刷新页面重试</div>';
+                            });
+                    });
+            } catch (error) {
+                console.error('Error in loadAITools:', error);
+                document.getElementById('aiToolsGrid').innerHTML = '<div class="no-results">加载失败，请刷新页面重试</div>';
+            }
+        }
+
+        // 渲染AI工具
+        function renderAITools(aiTools) {
+            const aiToolsGrid = document.getElementById('aiToolsGrid');
+
+            if (aiTools.length > 0) {
+                aiToolsGrid.innerHTML = ''; // 清空现有内容
+                aiTools.forEach(tool => {
+                    const toolCard = createAIToolCard(tool);
+                    aiToolsGrid.appendChild(toolCard);
+                });
+            } else {
+                aiToolsGrid.innerHTML = '<div class="no-results">暂无AI工具数据</div>';
+            }
+        }
+
+        // 创建AI工具卡片
+        function createAIToolCard(tool) {
+            const card = document.createElement('div');
+            card.className = 'resource-card';
+            card.dataset.category = tool.category || 'all';
+            card.innerHTML = `
+                <img src="${tool.thumbnail || 'images/default.png'}"
+                     alt="${tool.title}"
+                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIiBmaWxsPSIjZmZmZmZmIi8+CjxwYXRoIGQ9Ik0xNiAxMmMwIDYuNiAyIDEgMTEgMTEgMTIgMTJjMCAwLTEtNi02LTE2QzE0IDE2IDE0IDE2IDE0IDE0UzE0IDE1IDE1IDEwQzE1IDggMTQgNyAxNCA3IiBmaWxsPSIjZmZmZmZmIi8+CjxyZWN0IHg9IjE2IiB5PSIxNiIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiBmaWxsPSJ3aGl0ZSIvPgo8cmVjdCB4PSIxMiIgeT0iMTYiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2ZmZmZmZiIvPgo8L3N2Zz4='">
+                <div class="resource-info" style="display: flex; flex-direction: column; height: 100%;">
+                    <div style="flex: 1;">
+                        <h3>${tool.title}</h3>
+                        <p>${tool.description}</p>
+                        <div class="tags">
+                            ${tool.tags ? tool.tags.map(tag => `<span class="tag">${tag}</span>`).join('') : ''}
+                        </div>
+                        <div class="resource-meta">
+                            <span>🤖 AI工具</span>
+                            <span>⭐ ${tool.rating || 'N/A'}</span>
+                            <span>📥 ${tool.downloads || '0'}下载</span>
+                            <span>📁 ${tool.size || '未知'}</span>
+                        </div>
+                    </div>
+                    <div class="document-actions">
+                        <button class="document-btn preview-btn" onclick="previewDocument('${tool.id}', '${tool.title}')">
+                            📄 预览
+                        </button>
+                        <button class="document-btn download-btn" onclick="downloadResource('${tool.id}', '${tool.title}')">
+                            📥 下载工具
+                        </button>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        // 筛选工具
+        function filterTools(category) {
+            const buttons = document.querySelectorAll('.filter-btn');
+            const cards = document.querySelectorAll('.resource-card');
+
+            // 更新按钮状态
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(getCategoryName(category))) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // 筛选卡片
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // 获取分类名称
+        function getCategoryName(category) {
+            const categoryNames = {
+                'all': '全部',
+                'chat-ai': '聊天AI',
+                'ai-writing': 'AI写作',
+                'ai-art': 'AI艺术',
+                'ai-coding': 'AI编程'
+            };
+            return categoryNames[category] || category;
+        }
+    </script>
+    <script src="js/category-loader.js"></script>
+</body>
+</html>

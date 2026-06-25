@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>清除缓存</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .button { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .button:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+    <h1>清除缓存</h1>
+    <p>点击下方按钮清除浏览器缓存，然后刷新首页查看最新数据。</p>
+    <button class="button" onclick="clearCache()">清除localStorage缓存</button>
+    <div id="status"></div>
+    
+    <script>
+        function clearCache() {
+            localStorage.removeItem('resources');
+            localStorage.removeItem('categories');
+            document.getElementById('status').innerHTML = '缓存已清除！请刷新首页查看最新数据。';
+        }
+        
+        // 页面加载时显示当前缓存状态
+        window.onload = function() {
+            const hasResources = localStorage.getItem('resources') !== null;
+            document.getElementById('status').innerHTML = `当前缓存状态: ${hasResources ? '有缓存' : '无缓存'}`;
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "name": "learning-resource-website",
+  "version": "1.0.0",
+  "description": "学习资源展示网站",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "client": "python -m http.server 8000",
+    "client:start": "python -m http.server 8000"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.22.0",
+    "qiniu": "^7.15.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "学习资源",
+    "资源管理",
+    "文件上传"
+  ],
+  "author": "",
+  "license": "MIT"
+}
