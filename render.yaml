@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: learning-resource-website
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: QINIU_ACCESS_KEY
+        sync: false
+      - key: QINIU_SECRET_KEY
+        sync: false
+      - key: QINIU_BUCKET
+        value: bin220797
+      - key: QINIU_DOMAIN
+        value: th6uj1etn.hd-bkt.clouddn.com
+      - key: QINIU_ZONE
+        value: z0
