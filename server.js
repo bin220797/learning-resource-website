@@ -1529,8 +1529,14 @@ async function startServer() {
     }
 }
 
-// 启动服务器
-startServer();
+// Vercel 环境检测
+if (process.env.VERCEL) {
+    // Vercel Serverless 模式：导出 app
+    module.exports = app;
+} else {
+    // 本地/Render 模式：启动服务器
+    startServer();
+}
 
 // 处理未捕获的异常
 process.on('uncaughtException', (error) => {
