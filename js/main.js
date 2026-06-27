@@ -195,73 +195,47 @@ function createFeaturedItem(resource) {
 // 下载
 async function downloadResource(id, title) {
     console.log('开始下载资源:', id, title);
-    
+
     try {
         // 从服务器API获取资源的详细信息
-        console.log('正在获取资源信息...');
-        // 使用相对路径，这样无论是本地访问还是外网访问都能正确解析
         const response = await fetch(`/api/resources/${id}`);
-        console.log('API响应状态:', response.status);
-        
+
         if (!response.ok) {
             throw new Error('获取资源信息失败: ' + response.status);
         }
-        
+
         const resource = await response.json();
-        console.log('获取到的资源信息:', resource);
-        
+
         if (resource && resource.downloadUrl) {
-            console.log('资源下载链接:', resource.downloadUrl);
-            
-            // 确保下载链接使用正确的路径
             let downloadUrl = resource.downloadUrl;
-            if (!downloadUrl.startsWith('http')) {
-                // 如果是相对路径，保持相对路径，浏览器会自动解析
-                console.log('使用相对路径:', downloadUrl);
-            } else {
-                console.log('使用绝对路径:', downloadUrl);
-            }
-            
-            // 检查文件是否存在
-            console.log('检查文件是否存在...');
-            try {
-                const fileCheckResponse = await fetch(downloadUrl, { method: 'HEAD' });
-                console.log('文件检查响应状态:', fileCheckResponse.status);
-                
-                if (fileCheckResponse.ok) {
-                    // 文件存在，尝试下载
-                    console.log('文件存在，尝试打开下载链接...');
-                    const link = document.createElement('a');
-                    link.href = downloadUrl;
-                    link.target = '_blank';
-                    link.download = downloadUrl.split('/').pop();
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    console.log('下载链接已打开');
-                    
-                    // 更新资源的下载次数
-                    console.log('正在更新下载次数...');
-                    try {
-                        // 使用相对路径，这样无论是本地访问还是外网访问都能正确解析
-                        await fetch(`/api/resources/${id}`, {
-                            method: 'PUT',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ downloads: (resource.downloads || 0) + 1 })
-                        });
-                        console.log('下载次数更新成功');
-                    } catch (updateError) {
-                        console.error('更新下载次数失败:', updateError);
-                        // 即使更新下载次数失败，也不影响下载
-                    }
-                } else {
-                    // 文件不存在
-                    console.log('文件不存在:', downloadUrl);
-                    alert('文件不存在，请联系管理员');
+            // 确保是相对路径（走后端 /uploads 代理）
+            if (downloadUrl.startsWith('http')) {
+                // 如果仍然是绝对URL，提取路径部分
+                try {
+                    const urlObj = new URL(downloadUrl);
+                    downloadUrl = urlObj.pathname;
+                } catch (e) {
+                    // URL 解析失败，直接使用
                 }
-            } catch (fileCheckError) {
-                console.error('检查文件失败:', fileCheckError);
-                alert('文件不存在，请联系管理员');
+            }
+
+            // 直接下载（不再做 HEAD 检查，文件通过后端 rclone 代理提供）
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = downloadUrl.split('/').pop();
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // 更新资源的下载次数
+            try {
+                await fetch(`/api/resources/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ downloads: (resource.downloads || 0) + 1 })
+                });
+            } catch (updateError) {
+                console.error('更新下载次数失败:', updateError);
             }
         } else {
             console.log('资源下载链接不存在:', resource);

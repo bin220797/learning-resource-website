@@ -1218,8 +1218,8 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
             try {
                 console.log('正在上传到CSTCloud...');
                 await cstcloudStorage.uploadFile(localFilePath, qiniuKey);
-                fileUrl = cstcloudStorage.getPublicUrl(qiniuKey);
-                console.log('CSTCloud上传成功:', fileUrl);
+                fileUrl = `/uploads/${req.file.filename}`;
+                console.log('CSTCloud上传成功，使用相对路径:', fileUrl);
 
                 // 上传成功后删除本地文件（可选，保留本地作为回退缓存）
                 // 如需保留本地文件作为回退，注释掉下面这行
