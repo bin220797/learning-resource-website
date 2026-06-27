@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
 const mysql = require('mysql2/promise');
-const qiniuStorage = require('./config/qiniu');
+const cstcloudStorage = require('./config/cstcloud');
 
 // 存储模式标志
 let useFileStorage = true;
@@ -101,9 +101,9 @@ function saveUploadsToFile(uploads) {
     }
 }
 
-// 同步 JSON 数据到七牛云
-async function syncJsonToQiniu() {
-    if (!qiniuStorage.isEnabled) return;
+// 同步 JSON 数据到CSTCloud
+async function syncJsonToCstcloud() {
+    if (!cstcloudStorage.isEnabled) return;
 
     const files = [
         { local: resourcesFilePath, key: 'data/resources.json' },
@@ -113,15 +113,15 @@ async function syncJsonToQiniu() {
     for (const file of files) {
         if (fs.existsSync(file.local)) {
             const buffer = fs.readFileSync(file.local);
-            await qiniuStorage.uploadBuffer(buffer, file.key, 'application/json');
-            console.log(`已同步到七牛云: ${file.key}`);
+            await cstcloudStorage.uploadBuffer(buffer, file.key, 'application/json');
+            console.log(`已同步到CSTCloud: ${file.key}`);
         }
     }
 }
 
-// 从七牛云恢复 JSON 数据
-async function restoreJsonFromQiniu() {
-    if (!qiniuStorage.isEnabled) return;
+// 从CSTCloud恢复 JSON 数据
+async function restoreJsonFromCstcloud() {
+    if (!cstcloudStorage.isEnabled) return;
 
     const files = [
         { local: resourcesFilePath, key: 'data/resources.json' },
@@ -130,24 +130,19 @@ async function restoreJsonFromQiniu() {
 
     for (const file of files) {
         try {
-            const exists = await qiniuStorage.fileExists(file.key);
+            const exists = await cstcloudStorage.fileExists(file.key);
             if (exists) {
                 // 确保目录存在
                 const dir = path.dirname(file.local);
                 if (!fs.existsSync(dir)) {
                     fs.mkdirSync(dir, { recursive: true });
                 }
-                // 下载并覆盖本地文件
-                const url = qiniuStorage.getPublicUrl(file.key);
-                const response = await fetch(url);
-                if (response.ok) {
-                    const data = await response.text();
-                    fs.writeFileSync(file.local, data);
-                    console.log(`已从七牛云恢复: ${file.key}`);
-                }
+                // 使用 rclone 下载（避免 fetch 被 S3 代理拦截）
+                await cstcloudStorage.downloadFile(file.key, file.local);
+                console.log(`已从CSTCloud恢复: ${file.key}`);
             }
         } catch (err) {
-            console.error(`从七牛云恢复 ${file.key} 失败:`, err.message);
+            console.error(`从CSTCloud恢复 ${file.key} 失败:`, err.message);
         }
     }
 }
@@ -426,7 +421,7 @@ app.use(express.static(__dirname, {
         res.setHeader('Surrogate-Control', 'no-store');
     }
 })); // 提供整个项目目录的静态文件
-// uploads 文件服务：本地优先，本地没有则重定向到七牛云
+// uploads 文件服务：本地优先，本地没有则重定向到CSTCloud
 app.use('/uploads', (req, res, next) => {
     const safePath = path.normalize(req.path).replace(/^(\.\.(\/|\\|$))+/, '');
     const localFile = path.join(__dirname, 'uploads', safePath);
@@ -435,9 +430,21 @@ app.use('/uploads', (req, res, next) => {
         return res.sendFile(localFile);
     }
 
-    if (qiniuStorage.isEnabled) {
-        const qiniuUrl = qiniuStorage.getPublicUrl('uploads/' + safePath.replace(/\\/g, '/'));
-        return res.redirect(qiniuUrl);
+    if (cstcloudStorage.isEnabled) {
+        const key = 'uploads/' + safePath.replace(/\\/g, '/');
+        const mimeType = cstcloudStorage.getMimeType(key);
+        res.setHeader('Content-Type', mimeType);
+        cstcloudStorage.streamFile(key, res)
+            .then(() => {
+                // 流结束，响应会自动关闭
+            })
+            .catch(err => {
+                console.error('rclone 流式下载失败:', err.message);
+                if (!res.headersSent) {
+                    res.status(500).send('文件下载失败');
+                }
+            });
+        return;
     }
 
     res.status(404).send('文件不存在');
@@ -922,9 +929,9 @@ app.post('/api/resources', async (req, res) => {
 
         console.log('添加资源成功:', newResource);
 
-        // 同步到七牛云
-        if (useFileStorage && qiniuStorage.isEnabled) {
-            try { await syncJsonToQiniu(); } catch (e) { console.error('同步失败:', e.message); }
+        // 同步到CSTCloud
+        if (useFileStorage && cstcloudStorage.isEnabled) {
+            try { await syncJsonToCstcloud(); } catch (e) { console.error('同步失败:', e.message); }
         }
 
         res.json({ success: true, resource: newResource });
@@ -1078,9 +1085,9 @@ app.put('/api/resources/:id', async (req, res) => {
             
             console.log('更新后的资源:', updatedResource);
 
-            // 同步到七牛云
-            if (useFileStorage && qiniuStorage.isEnabled) {
-                try { await syncJsonToQiniu(); } catch (e) { console.error('同步失败:', e.message); }
+            // 同步到CSTCloud
+            if (useFileStorage && cstcloudStorage.isEnabled) {
+                try { await syncJsonToCstcloud(); } catch (e) { console.error('同步失败:', e.message); }
             }
 
             res.json({ success: true, resource: updatedResource });
@@ -1104,9 +1111,9 @@ app.delete('/api/resources/:id', async (req, res) => {
             if (filteredResources.length !== resources.length) {
                 saveResourcesToFile(filteredResources);
 
-                // 同步到七牛云
-                if (qiniuStorage.isEnabled) {
-                    try { await syncJsonToQiniu(); } catch (e) { console.error('同步失败:', e.message); }
+                // 同步到CSTCloud
+                if (cstcloudStorage.isEnabled) {
+                    try { await syncJsonToCstcloud(); } catch (e) { console.error('同步失败:', e.message); }
                 }
 
                 res.json({ success: true });
@@ -1202,23 +1209,23 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
         // 确保中文文件名正确处理
         const originalName = Buffer.from(req.file.originalname, 'latin1').toString('utf8');
 
-        // 七牛云上传
+        // CSTCloud上传
         let fileUrl = `/uploads/${req.file.filename}`;
         const localFilePath = req.file.path;
         const qiniuKey = `uploads/${req.file.filename}`;
 
-        if (qiniuStorage.isEnabled) {
+        if (cstcloudStorage.isEnabled) {
             try {
-                console.log('正在上传到七牛云...');
-                await qiniuStorage.uploadFile(localFilePath, qiniuKey);
-                fileUrl = qiniuStorage.getPublicUrl(qiniuKey);
-                console.log('七牛云上传成功:', fileUrl);
+                console.log('正在上传到CSTCloud...');
+                await cstcloudStorage.uploadFile(localFilePath, qiniuKey);
+                fileUrl = cstcloudStorage.getPublicUrl(qiniuKey);
+                console.log('CSTCloud上传成功:', fileUrl);
 
                 // 上传成功后删除本地文件（可选，保留本地作为回退缓存）
                 // 如需保留本地文件作为回退，注释掉下面这行
                 // fs.unlinkSync(localFilePath);
             } catch (qiniuErr) {
-                console.error('七牛云上传失败，使用本地存储:', qiniuErr.message);
+                console.error('CSTCloud上传失败，使用本地存储:', qiniuErr.message);
                 // 保留本地 URL 作为回退
             }
         }
@@ -1262,12 +1269,12 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
             }
         }
 
-        // 同步 resources.json 和 uploads.json 到七牛云
-        if (qiniuStorage.isEnabled) {
+        // 同步 resources.json 和 uploads.json 到CSTCloud
+        if (cstcloudStorage.isEnabled) {
             try {
-                await syncJsonToQiniu();
+                await syncJsonToCstcloud();
             } catch (syncErr) {
-                console.error('JSON同步到七牛云失败:', syncErr.message);
+                console.error('JSON同步到CSTCloud失败:', syncErr.message);
             }
         }
 
@@ -1488,8 +1495,8 @@ async function startServer() {
         // 初始化文件存储（作为后备）
         initFileStorage();
 
-        // 从七牛云恢复 JSON 数据（覆盖本地）
-        await restoreJsonFromQiniu();
+        // 从CSTCloud恢复 JSON 数据（覆盖本地）
+        await restoreJsonFromCstcloud();
 
         // 初始化数据库
         await initDatabase();

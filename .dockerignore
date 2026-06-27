@@ -1,0 +1,14 @@
+node_modules
+.git
+.env
+rclone/rclone.exe
+rclone/README.html
+rclone/README.txt
+rclone/git-log.txt
+rclone/rclone.1
+rclone/*.bat
+*.log
+test-*.js
+test-*.py
+uploads
+data/*.json

@@ -20,6 +20,9 @@ Thumbs.db
 .vscode/
 .idea/
 
+# rclone Windows 二进制（75MB，不同平台用不同版本）
+rclone/rclone.exe
+
 # 临时文件
 tmp/
 temp/
